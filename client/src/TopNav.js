@@ -1,16 +1,5 @@
 import React from 'react';
-import {
-    Collapse,
-    Navbar,
-    NavbarToggler,
-    NavbarBrand,
-    Nav,
-    NavItem,
-    NavLink,
-    UncontrolledDropdown,
-    DropdownToggle,
-    DropdownMenu,
-    DropdownItem } from 'reactstrap';
+import {Collapse, Nav, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink} from 'reactstrap';
 
 export default class TopNav extends React.Component {
     constructor(props) {
@@ -29,16 +18,20 @@ export default class TopNav extends React.Component {
     render() {
         return (
             <div>
-                <Navbar color="light" light expand="md">
-                    <NavbarBrand href="/">Snap Token</NavbarBrand>
+                <Navbar className="header" expand="md">
+                    <NavbarBrand href="/" color="white">Snap Token</NavbarBrand>
                     <NavbarToggler onClick={this.toggle} />
                     <Collapse isOpen={this.state.isOpen} navbar>
                         <Nav className="ml-auto" navbar>
                             <NavItem>
-                                <NavLink href="/login/">Login</NavLink>
+                                <NavLink href="/login/" style={{color: 'white'}}>
+                                    Login
+                                </NavLink>
                             </NavItem>
                             <NavItem>
-                                <NavLink href="/signup/">Sign Up</NavLink>
+                                <NavLink href="/signup/" style={{color: 'white'}}>
+                                    Sign Up
+                                </NavLink>
                             </NavItem>
                         </Nav>
                     </Collapse>
