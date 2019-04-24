@@ -13,18 +13,19 @@ import "https://github.com/OpenZeppelin/openzeppelin-solidity/contracts/token/ER
  * @dev Our ERC20 Token will be minted each month giving users their allowance. When vendors return their collected tokens
  *      in exchange for Ethereum, we will burn those returned.
  */
-contract SnapToken is IERC20, ERC20Detailed, ERC20Mintable, ERC20Burnable {
+contract SnapToken is ERC20, ERC20Detailed, ERC20Mintable, ERC20Burnable {
     uint8 public constant DECIMALS = 18;
-    uint256 public constant INITIAL_SUPPLY = 10000 * (10 ** uint256(DECIMALS));
+    uint256 public constant INITIAL_SUPPLY = 0 * (10 ** uint256(DECIMALS));
     
     mapping (string => address) vendors; //keep list of vendors
     mapping (string => address) members; //keep list of SNAP beneficiaries
     mapping (address => uint256) allowances; //keep list of allowances (only members)
-    mapping (address => uint256) balance; //keep list of balances (vendors and members)
+    //mapping (address => uint256) balance; //keep list of balances (vendors and members)
     address owner;
     string[] memberNames;
     string[] vendorNames;
-
+    
+    
     /**
      * @dev Constructor that gives msg.sender all of existing tokens.
      */
@@ -53,29 +54,41 @@ contract SnapToken is IERC20, ERC20Detailed, ERC20Mintable, ERC20Burnable {
     function useSnap(string memory me, string memory vendorName, uint256 amount) public returns (bool) {
         require(vendors[vendorName] != address(0)); //require vendor inside vendors mapping
         require(members[me] == msg.sender); //only members can use this function
-        require(balance[msg.sender] >= amount); //need to worry about gas?
-        SafeERC20.safeTransferFrom(SnapToken, msg.sender, vendors[vendorName], amount); //member to vendor transfer
-        //update balances?
-            //member and the vendor
+        require(balanceOf(msg.sender) >= amount); //need to worry about gas?
+        ERC20._transfer(msg.sender, vendors[vendorName], amount); //member to vendor transfer
+       
     }
     
     //vendor transfer to us
-    function exchangeSnap(string memory me, address to, uint256 amount) public returns (bool) {
-        require(to == owner);
+    function exchangeSnap(string memory me, uint256 amount) public returns (bool) {
         require(vendors[me] == msg.sender); //only vendors can use this function
-        require(balance[msg.sender] >= amount); //gas?
-        SafeERC20.safeTransferFrom("SnapToken", msg.sender, to, amount); //safeTransfer amount to owner
-            //burn the SnapToken?
-        //give eth back?
+        require(balanceOf(msg.sender) >= amount); //gas?
+        ERC20._transfer(msg.sender, owner, amount); //safeTransfer amount to owner
+        //burn the SnapToken
+        //oracle for current value of ether
+            //send msg.sender amount worth of ether from owner account
     }
         
     //get balance functions for members and vendors
-    function getBalance() public view {
-        return balance[msg.sender];
+    function getBalance() public view returns(uint256) {
+        return balanceOf(msg.sender);
     }
     
+    //add users/vendors
+    function addMember(string memory newName, address newAddress, uint256 newAllowance) public {
+        require(owner == msg.sender); //only owner can add new SNAP members
+        memberNames.push(newName);
+        members[newName] = newAddress;
+        allowances[newAddress] = newAllowance;
+    }
     
+    function addVendor(string memory newVendor, address newAddress) public {
+        require(owner == msg.sender); //only owner can add new vendors
+        vendorNames.push(newVendor);
+        vendors[newVendor] = newAddress;
+    }
     
+    //check if in contract/login
     
     
 }
