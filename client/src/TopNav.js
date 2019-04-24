@@ -18,7 +18,7 @@ export default class TopNav extends React.Component {
     render() {
         return (
             <div>
-                <Navbar className="header" expand="md">
+                <Navbar className="header navbar-dark" expand="md">
                     <NavbarBrand href="/" color="white">Snap Token</NavbarBrand>
                     <NavbarToggler onClick={this.toggle} />
                     <Collapse isOpen={this.state.isOpen} navbar>
