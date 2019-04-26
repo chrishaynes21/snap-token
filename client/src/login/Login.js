@@ -16,7 +16,7 @@ class Login extends Component {
                     <p className="lead">
                         Click the button to sign in. Ensure Metamask is logged in.
                     </p>
-                    <Button>Login</Button>
+                    <Button onClick={this.props.handleLoginSubmit.bind(this)}>Login</Button>
                 </Jumbotron>
             </div>
         );

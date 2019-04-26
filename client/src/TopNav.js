@@ -32,7 +32,7 @@ export default class TopNav extends React.Component {
                                 </NavLink>
                             </NavItem>
                             <NavItem>
-                                <NavLink to='/signup' style={{color: 'white'}} replace>
+                                <NavLink to='/signup' style={{color: 'white', paddingLeft: '50px'}} replace>
                                     Sign Up
                                 </NavLink>
                             </NavItem>

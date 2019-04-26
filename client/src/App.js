@@ -8,21 +8,32 @@ import Web3 from '../node_modules/web3';
 import Login from "./login/Login";
 import {Switch} from "react-router";
 
+import contractAbi from './contractAbi.json';
+
 class App extends Component {
     constructor(props) {
         super(props);
+
+        const web3 = new Web3('http://192.168.56.1:7545');
+        const contract = new web3.eth.Contract(contractAbi, '0x6148a781fe26560f007ce96fc27802fe335d0952');
+
         this.state = {
-            web3: new Web3('http://127.0.0.1:7545'),
+            web3: web3,
+            contract: contract,
             isLoggedIn: false,
-            loginType: null
-        }
+            loginType: null,
+            loginAddress: null
+        };
+    }
+
+    handleLoginSubmit() {
+        alert('Click');
     }
 
     render() {
-        const loginProps = {
-            ...this.state
+        const loginFunction = {
+            handleLoginSubmit: this.handleLoginSubmit
         };
-
         return (
             <HashRouter>
                 <div className='App'>
@@ -31,7 +42,7 @@ class App extends Component {
                     </header>
                     <Switch>
                         <Route exact path='/' component={Home}/>
-                        <Route exact path='/login' render={() => <Login {...loginProps}/>}/>
+                        <Route exact path='/login' render={() => <Login {...loginFunction}/>}/>
                     </Switch>
                     <footer>
                         <Footer/>
