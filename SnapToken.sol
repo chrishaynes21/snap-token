@@ -1,4 +1,4 @@
-pragma solidity ^0.5.2;
+pragma solidity ^0.5.7;
 
 import "https://github.com/OpenZeppelin/openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "https://github.com/OpenZeppelin/openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
@@ -7,13 +7,14 @@ import "https://github.com/OpenZeppelin/openzeppelin-solidity/contracts/token/ER
 import "https://github.com/OpenZeppelin/openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
 import "https://github.com/OpenZeppelin/openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
 
+import "github.com/oraclize/ethereum-api/oraclizeAPI.sol";
 
 /**
  * @title SnapToken
  * @dev Our ERC20 Token will be minted each month giving users their allowance. When vendors return their collected tokens
  *      in exchange for Ethereum, we will burn those returned.
  */
-contract SnapToken is ERC20, ERC20Detailed, ERC20Mintable, ERC20Burnable {
+contract SnapToken is ERC20, ERC20Detailed, ERC20Mintable, ERC20Burnable, usingOraclize {
     uint8 public constant DECIMALS = 18;
     uint256 public constant INITIAL_SUPPLY = 0 * (10 ** uint256(DECIMALS));
     
@@ -55,17 +56,17 @@ contract SnapToken is ERC20, ERC20Detailed, ERC20Mintable, ERC20Burnable {
         require(vendors[vendorName] != address(0)); //require vendor inside vendors mapping
         require(members[me] == msg.sender); //only members can use this function
         require(balanceOf(msg.sender) >= amount); //need to worry about gas?
-        ERC20._transfer(msg.sender, vendors[vendorName], amount); //member to vendor transfer
-       
+        _transfer(msg.sender, vendors[vendorName], amount); //member to vendor transfer
     }
     
     //vendor transfer to us
     function exchangeSnap(string memory me, uint256 amount) public returns (bool) {
         require(vendors[me] == msg.sender); //only vendors can use this function
         require(balanceOf(msg.sender) >= amount); //gas?
-        ERC20._transfer(msg.sender, owner, amount); //safeTransfer amount to owner
-        //burn the SnapToken
+        _transfer(msg.sender, owner, amount); //safeTransfer amount to owner
+        _burnFrom(owner, amount);
         //oracle for current value of ether
+        //oraclize_query("URL", "json(https://api.pro.coinbase.com/products/ETH-USD/ticker).price");
             //send msg.sender amount worth of ether from owner account
     }
         
@@ -88,8 +89,18 @@ contract SnapToken is ERC20, ERC20Detailed, ERC20Mintable, ERC20Burnable {
         vendors[newVendor] = newAddress;
     }
     
-    //check if in contract/login
+    function updatePrice() public payable returns(bytes32) {
+       if (oraclize_getPrice("URL") > getBalance()) {
+            //LogNewOraclizeQuery("Oraclize query was NOT sent, please add some ETH to cover for the query fee");
+       } else {
+            //oraclizeAPI.LogNewOraclizeQuery("Oraclize query was sent, standing by for the answer..");
+            bytes32 currentPrice = oraclize_query("URL", "json(https://api.pro.coinbase.com/products/ETH-USD/ticker).price");
     
+            return currentPrice;     
+       }
+   }
+    
+    //check if in contract/login
     
 }
 
