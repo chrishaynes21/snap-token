@@ -18,14 +18,14 @@ contract SnapToken is ERC20, ERC20Detailed, ERC20Mintable, ERC20Burnable, usingO
     uint8 public constant DECIMALS = 18;
     uint256 public constant INITIAL_SUPPLY = 0 * (10 ** uint256(DECIMALS));
     
-    mapping (string => address) vendors; //keep list of vendors
-    mapping (string => address) members; //keep list of SNAP beneficiaries
-    mapping (address => uint256) allowances; //keep list of allowances (only members)
-    //mapping (address => uint256) balance; //keep list of balances (vendors and members)
+    mapping (string => address) public vendors; //keep list of vendors
+    mapping (string => address) public members; //keep list of SNAP beneficiaries
+    mapping (address => uint256) public allowances; //keep list of allowances (only members)
     address owner;
     string[] memberNames;
     string[] vendorNames;
     
+    uint256 etherPrice;
     
     /**
      * @dev Constructor that gives msg.sender all of existing tokens.
@@ -66,13 +66,19 @@ contract SnapToken is ERC20, ERC20Detailed, ERC20Mintable, ERC20Burnable, usingO
         _transfer(msg.sender, owner, amount); //safeTransfer amount to owner
         _burnFrom(owner, amount);
         //oracle for current value of ether
-        //oraclize_query("URL", "json(https://api.pro.coinbase.com/products/ETH-USD/ticker).price");
-            //send msg.sender amount worth of ether from owner account
+        updatePrice();
+        uint256 etherAmount = amount/etherPrice;
+        //transfer etherAmount from owner to msg.sender
     }
         
     //get balance functions for members and vendors
     function getBalance() public view returns(uint256) {
         return balanceOf(msg.sender);
+    }
+    
+    //get etherPRice
+    function getEtherPrice() public view returns(uint256) {
+        return etherPrice;
     }
     
     //add users/vendors
@@ -89,16 +95,15 @@ contract SnapToken is ERC20, ERC20Detailed, ERC20Mintable, ERC20Burnable, usingO
         vendors[newVendor] = newAddress;
     }
     
-    function updatePrice() public payable returns(bytes32) {
-       if (oraclize_getPrice("URL") > getBalance()) {
-            //LogNewOraclizeQuery("Oraclize query was NOT sent, please add some ETH to cover for the query fee");
-       } else {
-            //oraclizeAPI.LogNewOraclizeQuery("Oraclize query was sent, standing by for the answer..");
-            bytes32 currentPrice = oraclize_query("URL", "json(https://api.pro.coinbase.com/products/ETH-USD/ticker).price");
-    
-            return currentPrice;     
-       }
+    function updatePrice() public returns(uint256) {
+       bytes32 queryID = oraclize_query("URL", "json(https://api.pro.coinbase.com/products/ETH-USD/ticker).price");
    }
+   
+   function __callback(bytes32 myid, string memory result) public {
+        require(msg.sender == oraclize_cbAddress(), "msg.sender is not Oraclize");
+        //update ether price
+        etherPrice = parseInt(result);
+    }
     
     //check if in contract/login
     
