@@ -26,6 +26,7 @@ class App extends Component {
             web3: web3,
             contract: contract,
             isLoggedIn: false,
+            loginName: '',
             loginType: null,
         };
 
@@ -36,7 +37,7 @@ class App extends Component {
         if (!this.state.isLoggedIn) {
             this.state.contract.methods.members(userName).call().then((memberAddress) => {
                 if (memberAddress === this.state.web3.eth.defaultAccount) {
-                    this.setState({loginType: 'member', isLoggedIn: true})
+                    this.setState({loginType: 'member', isLoggedIn: true, loginName: userName});
                     return true;
                 }
             });
@@ -44,7 +45,7 @@ class App extends Component {
         if (!this.state.isLoggedIn) {
             this.state.contract.methods.vendors(userName).call().then((memberAddress) => {
                 if (memberAddress === this.state.web3.eth.defaultAccount) {
-                    this.setState({loginType: 'vendor', isLoggedIn: true})
+                    this.setState({loginType: 'vendor', isLoggedIn: true, loginName: userName});
                     return true;
                 }
             });
@@ -59,7 +60,8 @@ class App extends Component {
         };
         const vendorOptions = {
             web3: this.state.web3,
-            contract: this.state.contract
+            contract: this.state.contract,
+            loginName: this.state.loginName
         };
 
 
