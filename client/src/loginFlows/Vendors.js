@@ -22,11 +22,18 @@ class Vendors extends React.Component {
         let error = false;
         let counter = 0;
         let vendors = [];
-        while (!error) {
+        const addVendor = function(counter) {
             this.props.contract.methods.memberNames(counter).call().then((vendorName) => {
-                console.log(vendorName);
-                vendors.push(vendorName);
+                if (vendorName === '') {
+                    error = true;
+                } else {
+                    console.log(vendorName);
+                    vendors.push(vendorName);
+                }
             });
+        };
+        while (!error) {
+            addVendor(counter++);
         }
         return vendors;
     }

@@ -1,6 +1,6 @@
 import React from 'react';
-import {Nav, Navbar, NavbarBrand, NavbarToggler, NavItem} from 'reactstrap';
-import {NavLink} from "react-router-dom";
+import {Nav, Navbar, NavbarBrand, NavItem} from 'reactstrap';
+import {Link, NavLink} from "react-router-dom";
 
 export default class TopNav extends React.Component {
     render() {
@@ -42,8 +42,7 @@ export default class TopNav extends React.Component {
         return (
             <div>
                 <Navbar className="header navbar-dark" expand="md">
-                    <NavbarBrand href="/" color="white">Snap Token</NavbarBrand>
-                    <NavbarToggler onClick={this.toggle}/>
+                    <NavbarBrand tag={Link} to="/" style={{color: 'white'}}>Snap Token</NavbarBrand>
                     <Nav className="ml-auto" navbar>
                         {navItem()}
                     </Nav>

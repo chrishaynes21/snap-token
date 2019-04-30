@@ -7,17 +7,15 @@ import Footer from './Footer';
 import Web3 from '../node_modules/web3';
 import Login from "./login/Login";
 import {Switch} from "react-router";
-
-import contractAbi from './contractAbi.json';
-import {Button, Modal, ModalBody, ModalFooter, ModalHeader} from "reactstrap";
 import Vendors from "./loginFlows/Vendors";
+import contractAbi from './contractAbi.json';
 
 class App extends Component {
     constructor(props) {
         super(props);
 
         const web3 = new Web3(Web3.givenProvider);
-        const contract = new web3.eth.Contract(contractAbi, '0xc64f893ba4c20f9b1b196efc001a39cbcc95b11a');
+        const contract = new web3.eth.Contract(contractAbi, '0xd6997d525244325409fd8ffe6ab7d46eaf3bdf0a');
 
         web3.eth.getAccounts().then(function (accounts) {
             web3.eth.defaultAccount = accounts[0];
@@ -29,11 +27,9 @@ class App extends Component {
             contract: contract,
             isLoggedIn: false,
             loginType: null,
-            errorModal: false
         };
 
         this.login = this.login.bind(this);
-        this.toggleModal = this.toggleModal.bind(this);
     }
 
     login(userName) {
@@ -41,6 +37,7 @@ class App extends Component {
             this.state.contract.methods.members(userName).call().then((memberAddress) => {
                 if (memberAddress === this.state.web3.eth.defaultAccount) {
                     this.setState({loginType: 'member', isLoggedIn: true})
+                    return true;
                 }
             });
         }
@@ -48,29 +45,23 @@ class App extends Component {
             this.state.contract.methods.vendors(userName).call().then((memberAddress) => {
                 if (memberAddress === this.state.web3.eth.defaultAccount) {
                     this.setState({loginType: 'vendor', isLoggedIn: true})
+                    return true;
                 }
             });
         }
-
-        if (!this.state.loggedIn) {
-            this.setState({errorModal: true});
-        }
-    }
-
-    toggleModal() {
-        this.setState((prevState) => ({
-            errorModal: !prevState.errorModal
-        }));
-    }
+        return false;
+    };
 
     render() {
-        const loginFunction = {
-            login: this.login
+        const loginInfo = {
+            login: this.login,
+            isLoggedIn: this.state.isLoggedIn
         };
         const vendorOptions = {
             web3: this.state.web3,
             contract: this.state.contract
         };
+
 
         return (
             <HashRouter>
@@ -78,18 +69,9 @@ class App extends Component {
                     <header>
                         <TopNav {...this.state}/>
                     </header>
-                    <Modal isOpen={this.state.errorModal} toggle={this.toggleModal}>
-                        <ModalHeader toggle={this.toggleModal}>Modal title</ModalHeader>
-                        <ModalBody>
-                            Unable to login. Please contact Snap owner to register.
-                        </ModalBody>
-                        <ModalFooter>
-                            <Button color="primary" onClick={this.toggleModal}>Close</Button>
-                        </ModalFooter>
-                    </Modal>
                     <Switch>
                         <Route exact path='/' component={Home}/>
-                        <Route exact path='/login' render={() => <Login {...loginFunction}/>}/>
+                        <Route exact path='/login' render={() => <Login {...loginInfo}/>}/>
                         <Route exact path='/vendors' render={() => <Vendors {...vendorOptions}/>}/>
                     </Switch>
                     <footer>
