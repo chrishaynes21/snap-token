@@ -20,12 +20,12 @@ class Vendors extends React.Component {
         this.state = {
             dropdownOpen: false,
             selectedVendor: 'Vendor',
-            snapAmount: null,
+            snapAmount: undefined,
             vendors: [],
-            spendColor: "primary"
+            spendColor: "primary",
+            balance: 0
         };
 
-        this.getVendorNames = this.getVendorNames.bind(this);
         this.toggleDropdown = this.toggleDropdown.bind(this);
         this.changeVendor = this.changeVendor.bind(this);
         this.changeSnap = this.changeSnap.bind(this);
@@ -34,6 +34,7 @@ class Vendors extends React.Component {
 
     componentWillMount() {
         this.getVendorNames();
+        this.getBalance();
     }
 
     getVendorNames() {
@@ -92,6 +93,14 @@ class Vendors extends React.Component {
             });
     }
 
+    getBalance() {
+        this.props.contract.methods.getBalance().call().then((balance) => {
+            this.setState({
+               balance: balance.toNumber()
+            });
+        });
+    }
+
     render() {
         if (this.props.loginName !== '') {
             return (
@@ -101,9 +110,12 @@ class Vendors extends React.Component {
                         <p className="lead">
                             Select a vendor to send snap token to.
                         </p>
+                        <br/>
+                        <h6 className="display-6">Current Snap Balance</h6>
+                        <h1 className="display-4">{this.state.balance}</h1>
                     </Jumbotron>
                     <Container>
-                        <Row>
+                        <Row style={{paddingTop: '50px'}}>
                             <InputGroup>
                                 <InputGroupButtonDropdown
                                     addonType="prepend"
