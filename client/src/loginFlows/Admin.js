@@ -8,7 +8,7 @@ import {
     Input,
     InputGroupButtonDropdown,
     Jumbotron,
-    Row,
+    Row, Spinner,
     Table
 } from 'reactstrap';
 import {Redirect} from 'react-router';
@@ -26,6 +26,8 @@ class Admin extends React.Component {
             isVendor: false,
             dropdownOpen: false,
             selectedUserType: 'User Type',
+            userSpinner: false,
+            allowanceSpinner: false
         };
 
         this.toggleDropdown = this.toggleDropdown.bind(this);
@@ -87,25 +89,26 @@ class Admin extends React.Component {
             (this.state.newAllowance === undefined && this.state.selectedUserType === 'Member')) {
             alert('No field can be blank.');
         } else {
+            this.setState({userSpinner: true});
             if (this.state.selectedUserType === 'Member') {
                 this.props.contract.methods.addMember(this.state.newUserName, this.state.newUserAddress, this.state.newAllowance)
                     .send()
-                    .on('receipt', (receipt) => {
-                        alert('Successfully added member');
-                        console.log(receipt);
+                    .on('confirmation', () => {
+                        this.setState({userSpinner: false});
                     })
                     .on('error', (error) => {
                         alert('Transaction failed with error: ' + error);
+                        this.setState({userSpinner: false});
                     });
             } else {
                 this.props.contract.methods.addVendor(this.state.newUserName, this.state.newUserAddress)
                     .send()
-                    .on('receipt', (receipt) => {
-                        alert('Successfully added vendor');
-                        console.log(receipt);
+                    .on('confirmation', () => {
+                        this.setState({userSpinner: false});
                     })
                     .on('error', (error) => {
                         alert('Transaction failed with error: ' + error);
+                        this.setState({userSpinner: false});
                     });
             }
         }
@@ -154,14 +157,15 @@ class Admin extends React.Component {
     }
 
     giveAllowances() {
+        this.setState({allowanceSpinner: true});
         this.props.contract.methods.giveAllowances()
             .send()
-            .on('receipt', (receipt) => {
-                alert('Successfully minted allowances');
-                console.log(receipt);
+            .on('confirmation', () => {
+                this.setState({allowanceSpinner: false});
             })
             .on('error', (error) => {
                 alert('Transaction failed with error: ' + error);
+                this.setState({allowanceSpinner: false});
             });
     }
 
@@ -210,7 +214,10 @@ class Admin extends React.Component {
                                            placeholder={'Allowance'} disabled={this.state.isVendor}/>
                                 </Row>
                                 <Row style={{marginTop: '25px'}}>
-                                    <Button onClick={this.submitNewUser}>Submit New User</Button>
+                                    <Button onClick={this.submitNewUser} style={{marginRight: '10px'}}>
+                                        Submit New User
+                                    </Button>
+                                    {this.state.userSpinner ? <Spinner type="grow" color="primary"/> : undefined}
                                 </Row>
                             </Col>
                             <Col>
@@ -236,9 +243,10 @@ class Admin extends React.Component {
                             </Col>
                             <Col>
                                 <h4 className='text-muted'>Give Allowances</h4>
-                                <Button onClick={this.giveAllowances}>Give
-                                    Allowances
+                                <Button onClick={this.giveAllowances} style={{marginRight: '10px'}}>
+                                    Give Allowances
                                 </Button>
+                                {this.state.allowanceSpinner ? <Spinner type="grow" color="primary"/> : undefined}
                             </Col>
                         </Row>
                     </Container>

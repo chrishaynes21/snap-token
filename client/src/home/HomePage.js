@@ -2,7 +2,7 @@ import React from 'react';
 import {Jumbotron} from 'reactstrap';
 import grocery_image from '../images/GroceryStore.jpg';
 
-const Home = (props) => {
+const Home = () => {
     return (
         <div>
             <Jumbotron style={{marginTop: '50px', marginBottom: '0px'}}>

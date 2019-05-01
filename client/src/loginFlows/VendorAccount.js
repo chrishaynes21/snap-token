@@ -79,8 +79,7 @@ class VendorAccount extends React.Component {
     spendSnap() {
         this.props.contract.methods.useSnap(this.props.loginName, this.state.selectedMember, this.state.snapAmount)
             .send()
-            .on('confirmation', (confirmationNumber) => {
-                alert('Success: your confirmation is ' + confirmationNumber);
+            .on('confirmation', () => {
                 this.setState({
                     spendColor: 'success'
                 });

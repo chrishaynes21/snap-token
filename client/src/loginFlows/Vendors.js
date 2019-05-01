@@ -7,7 +7,7 @@ import {
     Input,
     InputGroupButtonDropdown,
     Jumbotron,
-    Row
+    Row, Spinner
 } from 'reactstrap';
 import DropdownItem from 'reactstrap/es/DropdownItem';
 import InputGroup from 'reactstrap/es/InputGroup';
@@ -23,6 +23,7 @@ class Vendors extends React.Component {
             snapAmount: undefined,
             vendors: [],
             spendColor: 'primary',
+            spinner: false,
             balance: 0
         };
 
@@ -77,18 +78,19 @@ class Vendors extends React.Component {
     }
 
     spendSnap() {
+        this.setState({userSpinner: true});
         this.props.contract.methods.useSnap(this.props.loginName, this.state.selectedVendor, this.state.snapAmount)
             .send()
-            .on('receipt', (receipt) => {
-                alert('Successfully spent snap');
-                console.log(receipt);
+            .on('confirmation', () => {
                 this.setState({
+                    userSpinner: false,
                     spendColor: 'success'
                 });
             })
             .on('error', (error) => {
                 alert('Transaction failed with error: ' + error);
                 this.setState({
+                    userSpinner: false,
                     spendColor: 'danger'
                 });
             });
@@ -136,6 +138,7 @@ class Vendors extends React.Component {
                                        placeholder={'Snap Amount'}/>
                                 <InputGroupAddon addonType='append'>
                                     <Button color={this.state.spendColor} onClick={this.spendSnap}>Submit</Button>
+                                    {this.state.userSpinner ? <Spinner type="grow" color={this.state.spendColor}/> : undefined}
                                 </InputGroupAddon>
                             </InputGroup>
                         </Row>
