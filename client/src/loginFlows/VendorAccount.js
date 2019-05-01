@@ -14,7 +14,7 @@ import InputGroup from 'reactstrap/es/InputGroup';
 import InputGroupAddon from 'reactstrap/es/InputGroupAddon';
 import {Redirect} from 'react-router';
 
-class Vendors extends React.Component {
+class VendorAccount extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -54,7 +54,7 @@ class Vendors extends React.Component {
         }
 
         this.setState({
-            vendors: vendors
+            members: vendors
         });
     }
 
@@ -66,7 +66,7 @@ class Vendors extends React.Component {
 
     changeVendor(e) {
         this.setState({
-            selectedVendor: e.currentTarget.getAttribute('name')
+            selectedMember: e.currentTarget.getAttribute('name')
         });
     }
 
@@ -77,11 +77,10 @@ class Vendors extends React.Component {
     }
 
     spendSnap() {
-        this.props.contract.methods.useSnap(this.props.loginName, this.state.selectedVendor, this.state.snapAmount)
+        this.props.contract.methods.useSnap(this.props.loginName, this.state.selectedMember, this.state.snapAmount)
             .send()
-            .on('receipt', (receipt) => {
-                alert('Successfully spent snap');
-                console.log(receipt);
+            .on('confirmation', (confirmationNumber) => {
+                alert('Success: your confirmation is ' + confirmationNumber);
                 this.setState({
                     spendColor: 'success'
                 });
@@ -95,15 +94,15 @@ class Vendors extends React.Component {
     }
 
     getBalance() {
-        this.props.contract.methods.getBalance().call().then((balance) => {
+        this.props.contract.methods.getAllowance().call().then((balance) => {
             this.setState({
-               balance: balance.toNumber()
+                balance: balance.toNumber()
             });
         });
     }
 
     render() {
-        if (this.props.loginType === 'member') {
+        if (this.props.loginType === 'vendor') {
             return (
                 <div>
                     <Jumbotron style={{marginTop: '50px', marginBottom: '0px'}}>
@@ -123,10 +122,10 @@ class Vendors extends React.Component {
                                     isOpen={this.state.dropdownOpen}
                                     toggle={this.toggleDropdown}>
                                     <DropdownToggle caret>
-                                        {this.state.selectedVendor}
+                                        {this.state.selectedMember}
                                     </DropdownToggle>
                                     <DropdownMenu>
-                                        {this.state.vendors.map((vendor) => {
+                                        {this.state.members.map((vendor) => {
                                             return <DropdownItem name={vendor}
                                                                  onClick={this.changeVendor}>{vendor}</DropdownItem>
                                         })}
@@ -148,4 +147,4 @@ class Vendors extends React.Component {
     };
 }
 
-export default Vendors;
+export default VendorAccount;

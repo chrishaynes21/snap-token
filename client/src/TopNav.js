@@ -1,6 +1,6 @@
 import React from 'react';
 import {Nav, Navbar, NavbarBrand, NavItem} from 'reactstrap';
-import {Link, NavLink} from "react-router-dom";
+import {Link, NavLink} from 'react-router-dom';
 
 export default class TopNav extends React.Component {
     render() {
@@ -32,8 +32,8 @@ export default class TopNav extends React.Component {
             } else {
                 return (
                     <NavItem>
-                        <NavLink to='/owner' style={{color: 'white'}} replace>
-                            Admin Stuff
+                        <NavLink to='/admin' style={{color: 'white'}} replace>
+                            Admin
                         </NavLink>
                     </NavItem>
                 );
@@ -41,9 +41,9 @@ export default class TopNav extends React.Component {
         };
         return (
             <div>
-                <Navbar className="header navbar-dark" expand="md">
-                    <NavbarBrand tag={Link} to="/" style={{color: 'white'}}>Snap Token</NavbarBrand>
-                    <Nav className="ml-auto" navbar>
+                <Navbar className='header navbar-dark' expand='md'>
+                    <NavbarBrand tag={Link} to='/' style={{color: 'white'}}>Snap Token</NavbarBrand>
+                    <Nav className='ml-auto' navbar>
                         {navItem()}
                     </Nav>
                 </Navbar>

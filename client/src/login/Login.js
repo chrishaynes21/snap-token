@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import {Button, Container, Input, InputGroup, InputGroupAddon, Jumbotron, Row} from "reactstrap";
-import {Redirect} from "react-router";
+import {Button, Container, Input, InputGroup, InputGroupAddon, Jumbotron, Row} from 'reactstrap';
+import {Redirect} from 'react-router';
 
 class Login extends Component {
     constructor(props) {
@@ -33,9 +33,9 @@ class Login extends Component {
         if (!this.props.isLoggedIn) {
             return (
                 <div>
-                    <Jumbotron>
-                        <h1 className="display-3">Login</h1>
-                        <p className="lead">
+                    <Jumbotron style={{marginTop: '50px'}}>
+                        <h1 className='display-3'>Login</h1>
+                        <p className='lead'>
                             Enter your username. Ensure Metamask is logged in.
                         </p>
                     </Jumbotron>
@@ -43,14 +43,14 @@ class Login extends Component {
                         <Row>
                             <InputGroup>
                                 <Input
-                                    type="text"
-                                    name="text"
-                                    id="memberName"
-                                    placeholder="Ex: username"
+                                    type='text'
+                                    name='text'
+                                    id='memberName'
+                                    placeholder='Ex: username'
                                     value={this.state.userName}
                                     onChange={this.handleChange}
                                 />
-                                <InputGroupAddon addonType="append">
+                                <InputGroupAddon addonType='append'>
                                     <Button color={this.state.loginColor} onClick={() => this.handleLogin()}>Login</Button>
                                 </InputGroupAddon>
                             </InputGroup>
@@ -59,7 +59,7 @@ class Login extends Component {
                 </div>
             );
         } else {
-            return (<Redirect push to="/"/>)
+            return (<Redirect push to='/'/>)
         }
     }
 }

@@ -5,10 +5,12 @@ import TopNav from './TopNav';
 import Home from './home/HomePage';
 import Footer from './Footer';
 import Web3 from '../node_modules/web3';
-import Login from "./login/Login";
-import {Switch} from "react-router";
-import Vendors from "./loginFlows/Vendors";
+import Login from './login/Login';
+import {Switch} from 'react-router';
+import Vendors from './loginFlows/Vendors';
 import contractAbi from './contractAbi.json';
+import VendorAccount from './loginFlows/VendorAccount';
+import Admin from './loginFlows/Admin';
 
 class App extends Component {
     constructor(props) {
@@ -50,6 +52,14 @@ class App extends Component {
                 }
             });
         }
+        if (!this.state.isLoggedIn) {
+            this.state.contract.methods.owner().call().then((memberAddress) => {
+                if (memberAddress === this.state.web3.eth.defaultAccount) {
+                    this.setState({loginType: 'owner', isLoggedIn: true, loginName: userName});
+                    return true;
+                }
+            });
+        }
         return false;
     };
 
@@ -61,7 +71,8 @@ class App extends Component {
         const vendorOptions = {
             web3: this.state.web3,
             contract: this.state.contract,
-            loginName: this.state.loginName
+            loginName: this.state.loginName,
+            loginType: this.state.loginType
         };
 
 
@@ -75,6 +86,8 @@ class App extends Component {
                         <Route exact path='/' component={Home}/>
                         <Route exact path='/login' render={() => <Login {...loginInfo}/>}/>
                         <Route exact path='/vendors' render={() => <Vendors {...vendorOptions}/>}/>
+                        <Route exact path='/vendorAccount' render={() => <VendorAccount {...vendorOptions}/>}/>
+                        <Route exact path='/admin' render={() => <Admin {...vendorOptions}/>}/>
                     </Switch>
                     <footer>
                         <Footer/>

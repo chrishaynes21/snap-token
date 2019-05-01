@@ -6,8 +6,8 @@ const Home = (props) => {
     return (
         <div>
             <Jumbotron style={{marginTop: '50px', marginBottom: '0px'}}>
-                <h1 className="display-3">Snap Token</h1>
-                <p className="lead">
+                <h1 className='display-3'>Snap Token</h1>
+                <p className='lead'>
                     Welcome to Snap Token, the home for using Snap to buy goods from registered vendors.
                 </p>
             </Jumbotron>
