@@ -37,8 +37,9 @@ contract SnapToken is ERC20, ERC20Detailed, ERC20Mintable, ERC20Burnable, usingO
         updatePrice(); //fill ether price when contract is deployed
         
         //remove after testing
-        //addMember("Paul", 0x2d03e08DEf83B3440F7AACA1706308D2D7B550b8, 100);
-        //addVendor("King Soopers", 0x19edA1943E6835Cd4723E1d350096E87D538ab2b);
+        addMember("Paul", 0x2d03e08DEf83B3440F7AACA1706308D2D7B550b8, 350);
+        addMember("Dennis", 0xE053D3F71A65344357F8300CBB48163b7F862505, 400);
+        addVendor("King Soopers", 0x19edA1943E6835Cd4723E1d350096E87D538ab2b);
     }
     
     
@@ -97,6 +98,16 @@ contract SnapToken is ERC20, ERC20Detailed, ERC20Mintable, ERC20Burnable, usingO
     
     function getContractBalance() public view returns(uint256) {
         return address(this).balance;
+    }
+    
+    function getRequiredEther() public view returns(uint256) {
+        uint256 sum = 0;
+        for(uint i = 0; i < memberNames.length; i++) { //loop through members
+            address tempMemberAddress = members[memberNames[i]];
+            sum += allowances[tempMemberAddress];
+        }
+        uint256 requiredEther = (sum * 10**18)/etherPrice;
+        return requiredEther;
     }
     
     //add users
