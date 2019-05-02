@@ -40,9 +40,22 @@ class VendorAccount extends React.Component {
     }
 
     exchangeSnap() {
-        // TODO: Write exchange function
         this.setState({spinner: true});
-        setTimeout(() => {this.setState({spinner: false})}, 2000);
+        this.props.contract.methods.exchangeSnap(this.props.loginName, this.state.snapAmount)
+            .send()
+            .on('confirmation', () => {
+                this.setState({
+                    spinner: false,
+                    spendColor: 'success'
+                });
+            })
+            .on('error', (error) => {
+               alert('Transaction failed with error: ' + error);
+                this.setState({
+                    spinner: false,
+                    spendColor: 'danger'
+                });
+            });
     }
 
     getBalance() {

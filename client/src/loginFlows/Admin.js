@@ -156,17 +156,19 @@ class Admin extends React.Component {
         });
     }
 
-    giveAllowances() {
+    async giveAllowances() {
         this.setState({allowanceSpinner: true});
-        this.props.contract.methods.giveAllowances()
-            .send()
-            .on('confirmation', () => {
-                this.setState({allowanceSpinner: false});
-            })
-            .on('error', (error) => {
-                alert('Transaction failed with error: ' + error);
-                this.setState({allowanceSpinner: false});
-            });
+        this.props.contract.methods.getRequiredEther().call().then((wei) => {
+            this.props.contract.methods.giveAllowances()
+                .send({value: wei})
+                .on('confirmation', () => {
+                    this.setState({allowanceSpinner: false});
+                })
+                .on('error', (error) => {
+                    alert('Transaction failed with error: ' + error);
+                    this.setState({allowanceSpinner: false});
+                });
+        });
     }
 
     render() {

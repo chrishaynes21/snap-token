@@ -17,7 +17,7 @@ class App extends Component {
         super(props);
 
         const web3 = new Web3(Web3.givenProvider);
-        const contract = new web3.eth.Contract(contractAbi, '0xd6997d525244325409fd8ffe6ab7d46eaf3bdf0a');
+        const contract = new web3.eth.Contract(contractAbi, '0xcd852b6b4b2f80c880c7b5ec84476b92287e132d');
 
         web3.eth.getAccounts().then(function (accounts) {
             web3.eth.defaultAccount = accounts[0];
