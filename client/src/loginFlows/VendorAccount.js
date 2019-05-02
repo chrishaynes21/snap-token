@@ -1,15 +1,5 @@
 import React from 'react';
-import {
-    Button,
-    Container,
-    DropdownMenu,
-    DropdownToggle,
-    Input,
-    InputGroupButtonDropdown,
-    Jumbotron,
-    Row
-} from 'reactstrap';
-import DropdownItem from 'reactstrap/es/DropdownItem';
+import {Button, Col, Container, Input, Jumbotron, Row, Spinner} from 'reactstrap';
 import InputGroup from 'reactstrap/es/InputGroup';
 import InputGroupAddon from 'reactstrap/es/InputGroupAddon';
 import {Redirect} from 'react-router';
@@ -18,56 +8,20 @@ class VendorAccount extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            dropdownOpen: false,
-            selectedVendor: 'Vendor',
             snapAmount: undefined,
-            vendors: [],
             spendColor: 'primary',
-            balance: 0
+            etherPrice: undefined,
+            balance: 0,
+            spinner: false
         };
 
-        this.toggleDropdown = this.toggleDropdown.bind(this);
-        this.changeVendor = this.changeVendor.bind(this);
         this.changeSnap = this.changeSnap.bind(this);
-        this.spendSnap = this.spendSnap.bind(this);
+        this.exchangeSnap = this.exchangeSnap.bind(this);
     }
 
-    componentWillMount() {
-        this.getVendorNames();
+    componentDidMount() {
         this.getBalance();
-    }
-
-    getVendorNames() {
-        let vendors = [];
-        let vendorIndex = 0;
-
-        const addVendor = function (context, counter) {
-            context.props.contract.methods.vendorNames(counter).call().then((vendorName) => {
-                if (vendorName !== null) {
-                    vendors.push(vendorName);
-                }
-            });
-        };
-
-        while (vendorIndex < 100) {
-            addVendor(this, vendorIndex++);
-        }
-
-        this.setState({
-            members: vendors
-        });
-    }
-
-    toggleDropdown() {
-        this.setState({
-            dropdownOpen: !this.state.dropdownOpen
-        });
-    }
-
-    changeVendor(e) {
-        this.setState({
-            selectedMember: e.currentTarget.getAttribute('name')
-        });
+        this.getEtherPrice();
     }
 
     changeSnap(e) {
@@ -76,24 +30,23 @@ class VendorAccount extends React.Component {
         })
     }
 
-    spendSnap() {
-        this.props.contract.methods.useSnap(this.props.loginName, this.state.selectedMember, this.state.snapAmount)
-            .send()
-            .on('confirmation', () => {
-                this.setState({
-                    spendColor: 'success'
-                });
-            })
-            .on('error', (error) => {
-                alert('Transaction failed with error: ' + error);
-                this.setState({
-                    spendColor: 'danger'
-                });
+    getEtherPrice() {
+        this.props.contract.methods.etherPrice().call().then((etherPrice) => {
+            console.log(etherPrice);
+            this.setState({
+               etherPrice: etherPrice.toNumber()
             });
+        })
+    }
+
+    exchangeSnap() {
+        // TODO: Write exchange function
+        this.setState({spinner: true});
+        setTimeout(() => {this.setState({spinner: false})}, 2000);
     }
 
     getBalance() {
-        this.props.contract.methods.getAllowance().call().then((balance) => {
+        this.props.contract.methods.getBalance().call().then((balance) => {
             this.setState({
                 balance: balance.toNumber()
             });
@@ -105,9 +58,9 @@ class VendorAccount extends React.Component {
             return (
                 <div>
                     <Jumbotron style={{marginTop: '50px', marginBottom: '0px'}}>
-                        <h1 className='display-3'>Vendor Area</h1>
+                        <h1 className='display-3'>Vendor Account</h1>
                         <p className='lead'>
-                            Select a vendor to send snap token to.
+                            Exchange Snap for Ether
                         </p>
                         <br/>
                         <h6 className='display-6'>Current Snap Balance</h6>
@@ -115,27 +68,25 @@ class VendorAccount extends React.Component {
                     </Jumbotron>
                     <Container>
                         <Row style={{paddingTop: '50px'}}>
-                            <InputGroup>
-                                <InputGroupButtonDropdown
-                                    addonType='prepend'
-                                    isOpen={this.state.dropdownOpen}
-                                    toggle={this.toggleDropdown}>
-                                    <DropdownToggle caret>
-                                        {this.state.selectedMember}
-                                    </DropdownToggle>
-                                    <DropdownMenu>
-                                        {this.state.members.map((vendor) => {
-                                            return <DropdownItem name={vendor}
-                                                                 onClick={this.changeVendor}>{vendor}</DropdownItem>
-                                        })}
-                                    </DropdownMenu>
-                                </InputGroupButtonDropdown>
-                                <Input type='number' value={this.state.snapAmount} onChange={this.changeSnap}
-                                       placeholder={'Snap Amount'}/>
-                                <InputGroupAddon addonType='append'>
-                                    <Button color={this.state.spendColor} onClick={this.spendSnap}>Submit</Button>
-                                </InputGroupAddon>
-                            </InputGroup>
+                            <Col>
+                                <InputGroup>
+                                    <Input type='number' value={this.state.snapAmount} onChange={this.changeSnap}
+                                           placeholder={'Snap Amount'}/>
+                                    <InputGroupAddon addonType='append'>
+                                        <Button color={this.state.spendColor}
+                                                onClick={this.exchangeSnap}>Submit</Button>
+                                        {this.state.spinner ? <Spinner type="grow" color={this.state.spendColor}/> : undefined}
+                                    </InputGroupAddon>
+                                </InputGroup>
+                            </Col>
+                            <Col style={{textAlign: 'center'}}>
+                                <h4>Ether Amount</h4>
+                                <h1 className="display-4">
+                                    {this.state.snapAmount && this.state.etherPrice ?
+                                        (this.state.snapAmount / this.state.etherPrice).toPrecision(3) : undefined
+                                    }
+                                </h1>
+                            </Col>
                         </Row>
                     </Container>
                 </div>
