@@ -35,11 +35,6 @@ contract SnapToken is ERC20, ERC20Detailed, ERC20Mintable, ERC20Burnable, usingO
         _mint(msg.sender, INITIAL_SUPPLY);
         owner = msg.sender;
         updatePrice(); //fill ether price when contract is deployed
-        
-        //remove after testing
-        addMember("Paul", 0x2d03e08DEf83B3440F7AACA1706308D2D7B550b8, 350);
-        addMember("Dennis", 0xE053D3F71A65344357F8300CBB48163b7F862505, 400);
-        addVendor("King Soopers", 0x19edA1943E6835Cd4723E1d350096E87D538ab2b);
     }
     
     
